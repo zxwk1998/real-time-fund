@@ -1543,6 +1543,7 @@ export default function HomePage() {
 
   // 排序状态
   const [sortBy, setSortBy] = useState('default'); // default, name, yield, holding
+  const [sortOrder, setSortOrder] = useState('desc'); // asc | desc
 
   // 视图模式
   const [viewMode, setViewMode] = useState('card'); // card, list
@@ -1691,18 +1692,18 @@ export default function HomePage() {
       const group = groups.find(g => g.id === currentTab);
       return group ? group.codes.includes(f.code) : true;
     })
-    .sort((a, b) => {
+  .sort((a, b) => {
       if (sortBy === 'yield') {
         const valA = typeof a.estGszzl === 'number' ? a.estGszzl : (Number(a.gszzl) || 0);
         const valB = typeof b.estGszzl === 'number' ? b.estGszzl : (Number(b.gszzl) || 0);
-        return valB - valA;
+        return sortOrder === 'asc' ? valA - valB : valB - valA;
       }
       if (sortBy === 'holding') {
         const pa = getHoldingProfit(a, holdings[a.code]);
         const pb = getHoldingProfit(b, holdings[b.code]);
         const valA = pa?.profitTotal ?? Number.NEGATIVE_INFINITY;
         const valB = pb?.profitTotal ?? Number.NEGATIVE_INFINITY;
-        return valB - valA;
+        return sortOrder === 'asc' ? valA - valB : valB - valA;
       }
       return 0;
     });
@@ -2867,10 +2868,32 @@ export default function HomePage() {
                       <button
                         key={s.id}
                         className={`chip ${sortBy === s.id ? 'active' : ''}`}
-                        onClick={() => setSortBy(s.id)}
-                        style={{ height: '28px', fontSize: '12px', padding: '0 10px' }}
+                        onClick={() => {
+                          if (sortBy === s.id) {
+                            // 同一按钮重复点击，切换升序/降序
+                            setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+                          } else {
+                            // 切换到新的排序字段，默认用降序
+                            setSortBy(s.id);
+                            setSortOrder('desc');
+                          }
+                        }}
+                        style={{ height: '28px', fontSize: '12px', padding: '0 10px', display: 'flex', alignItems: 'center', gap: 4 }}
                       >
-                        {s.label}
+                        <span>{s.label}</span>
+                        {s.id !== 'default' && sortBy === s.id && (
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              flexDirection: 'column',
+                              lineHeight: 1,
+                              fontSize: '8px',
+                            }}
+                          >
+                            <span style={{ opacity: sortOrder === 'asc' ? 1 : 0.3 }}>▲</span>
+                            <span style={{ opacity: sortOrder === 'desc' ? 1 : 0.3 }}>▼</span>
+                          </span>
+                        )}
                       </button>
                     ))}
                   </div>
