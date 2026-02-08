@@ -38,7 +38,16 @@
    npm install
    ```
 
-3. 运行开发服务器：
+3. 配置环境变量：
+   ```bash
+   cp env.example .env.local
+   ```
+   按照 `env.example` 填入以下值：
+  - `NEXT_PUBLIC_SUPABASE_URL`：Supabase 项目 URL
+  - `NEXT_PUBLIC_SUPABASE_ANON_KEY`：Supabase 匿名公钥
+  - `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY`：Web3Forms Access Key
+
+4. 运行开发服务器：
    ```bash
    npm run dev
    ```
@@ -47,6 +56,7 @@
 ### 构建与部署
 
 本项目已配置 GitHub Actions。每次推送到 `main` 分支时，会自动执行构建并部署到 GitHub Pages。
+如需使用 GitHub Actions 部署，请在 GitHub 项目 Settings → Secrets and variables → Actions 中创建对应的 Repository secrets（字段名称与 `.env.local` 保持一致）。
 
 若要手动构建：
 ```bash
