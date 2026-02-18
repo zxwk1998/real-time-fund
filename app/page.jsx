@@ -10,8 +10,8 @@ import timezone from 'dayjs/plugin/timezone';
 import Announcement from "./components/Announcement";
 import { DatePicker, DonateTabs, NumericInput, Stat } from "./components/Common";
 import FundTrendChart from "./components/FundTrendChart";
-import { ChevronIcon, CloseIcon, CloudIcon, DragIcon, ExitIcon, EyeIcon, EyeOffIcon, GridIcon, ListIcon, LoginIcon, LogoutIcon, MailIcon, PinIcon, PinOffIcon, PlusIcon, RefreshIcon, SettingsIcon, SortIcon, StarIcon, TrashIcon, UpdateIcon, UserIcon } from "./components/Icons";
-import weChatGroupImg from "./assets/weChatGroup.png";
+import { ChevronIcon, CloseIcon, CloudIcon, DragIcon, ExitIcon, EyeIcon, EyeOffIcon, GridIcon, ListIcon, LoginIcon, LogoutIcon, MailIcon, PinIcon, PinOffIcon, PlusIcon, RefreshIcon, SettingsIcon, SortIcon, StarIcon, TrashIcon, UpdateIcon, UserIcon, CameraIcon } from "./components/Icons";
+import weChatGroupImg from "./assets/weChatGroup.jpg";
 import { supabase, isSupabaseConfigured } from './lib/supabase';
 import { fetchFundData, fetchLatestRelease, fetchShanghaiIndexDate, fetchSmartFundNetValue, searchFunds, submitFeedback } from './api/fund';
 import packageJson from '../package.json';
@@ -279,6 +279,30 @@ function HoldingActionModal({ fund, onClose, onAction }) {
   );
 }
 
+function ScanButton({ onClick, disabled }) {
+  return (
+    <button
+      type="button"
+      className="icon-button"
+      onClick={onClick}
+      disabled={disabled}
+      title="拍照/上传图片识别基金代码"
+      style={{
+        opacity: disabled ? 0.5 : 1,
+        cursor: disabled ? 'wait' : 'pointer',
+        width: '32px',
+        height: '32px'
+      }}
+    >
+      {disabled ? (
+        <div className="loading-spinner" style={{ width: 16, height: 16, border: '2px solid var(--muted)', borderTopColor: 'var(--primary)', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+      ) : (
+        <CameraIcon width="18" height="18" />
+      )}
+    </button>
+  );
+}
+
 function TradeModal({ type, fund, holding, onClose, onConfirm, pendingTrades = [], onDeletePending }) {
   const isBuy = type === 'buy';
   const [share, setShare] = useState('');
@@ -295,9 +319,9 @@ function TradeModal({ type, fund, holding, onClose, onConfirm, pendingTrades = [
   }, [pendingTrades, fund]);
 
   const pendingSellShare = useMemo(() => {
-      return currentPendingTrades
-          .filter(t => t.type === 'sell')
-          .reduce((acc, curr) => acc + (Number(curr.share) || 0), 0);
+    return currentPendingTrades
+      .filter(t => t.type === 'sell')
+      .reduce((acc, curr) => acc + (Number(curr.share) || 0), 0);
   }, [currentPendingTrades]);
 
   const availableShare = holding ? Math.max(0, holding.share - pendingSellShare) : 0;
@@ -306,9 +330,9 @@ function TradeModal({ type, fund, holding, onClose, onConfirm, pendingTrades = [
 
   // Auto-close pending list if empty
   useEffect(() => {
-      if (showPendingList && currentPendingTrades.length === 0) {
-          setShowPendingList(false);
-      }
+    if (showPendingList && currentPendingTrades.length === 0) {
+      setShowPendingList(false);
+    }
   }, [showPendingList, currentPendingTrades]);
 
   const getEstimatePrice = () => fund?.estPricedCoverage > 0.05 ? fund?.estGsz : (typeof fund?.gsz === 'number' ? fund?.gsz : Number(fund?.dwjz));
@@ -318,23 +342,23 @@ function TradeModal({ type, fund, holding, onClose, onConfirm, pendingTrades = [
 
   useEffect(() => {
     if (date && fund?.code) {
-        setLoadingPrice(true);
-        setActualDate(null);
+      setLoadingPrice(true);
+      setActualDate(null);
 
-        let queryDate = date;
-        if (isAfter3pm) {
-            queryDate = toTz(date).add(1, 'day').format('YYYY-MM-DD');
+      let queryDate = date;
+      if (isAfter3pm) {
+        queryDate = toTz(date).add(1, 'day').format('YYYY-MM-DD');
+      }
+
+      fetchSmartFundNetValue(fund.code, queryDate).then(result => {
+        if (result) {
+          setPrice(result.value);
+          setActualDate(result.date);
+        } else {
+          setPrice(0);
+          setActualDate(null);
         }
-
-        fetchSmartFundNetValue(fund.code, queryDate).then(result => {
-            if (result) {
-                setPrice(result.value);
-                setActualDate(result.date);
-            } else {
-                setPrice(0);
-                setActualDate(null);
-            }
-        }).finally(() => setLoadingPrice(false));
+      }).finally(() => setLoadingPrice(false));
     }
   }, [date, isAfter3pm, isBuy, fund]);
 
@@ -364,13 +388,13 @@ function TradeModal({ type, fund, holding, onClose, onConfirm, pendingTrades = [
     const f = parseFloat(feeRate);
     const p = parseFloat(price);
     if (a > 0 && !isNaN(f)) {
-        if (p > 0) {
-            const netAmount = a / (1 + f / 100);
-            const s = netAmount / p;
-            setCalcShare(s.toFixed(2));
-        } else {
-            setCalcShare('待确认');
-        }
+      if (p > 0) {
+        const netAmount = a / (1 + f / 100);
+        const s = netAmount / p;
+        setCalcShare(s.toFixed(2));
+      } else {
+        setCalcShare('待确认');
+      }
     } else {
       setCalcShare(null);
     }
@@ -388,11 +412,11 @@ function TradeModal({ type, fund, holding, onClose, onConfirm, pendingTrades = [
   };
 
   const handleFinalConfirm = () => {
-      if (isBuy) {
-        onConfirm({ share: calcShare === '待确认' ? null : Number(calcShare), price: Number(price), totalCost: Number(amount), date, isAfter3pm, feeRate: Number(feeRate) });
-        return;
-      }
-      onConfirm({ share: Number(share), price: Number(price), date: actualDate || date, isAfter3pm, feeMode, feeValue });
+    if (isBuy) {
+      onConfirm({ share: calcShare === '待确认' ? null : Number(calcShare), price: Number(price), totalCost: Number(amount), date, isAfter3pm, feeRate: Number(feeRate) });
+      return;
+    }
+    onConfirm({ share: Number(share), price: Number(price), date: actualDate || date, isAfter3pm, feeMode, feeValue });
   };
 
   const isValid = isBuy
@@ -400,9 +424,9 @@ function TradeModal({ type, fund, holding, onClose, onConfirm, pendingTrades = [
     : (!!share && !!date);
 
   const handleSetShareFraction = (fraction) => {
-      if(availableShare > 0) {
-          setShare((availableShare * fraction).toFixed(2));
-      }
+    if(availableShare > 0) {
+      setShare((availableShare * fraction).toFixed(2));
+    }
   };
 
   const [revokeTrade, setRevokeTrade] = useState(null);
@@ -437,500 +461,500 @@ function TradeModal({ type, fund, holding, onClose, onConfirm, pendingTrades = [
         </div>
 
         {!showPendingList && !showConfirm && currentPendingTrades.length > 0 && (
-            <div
-                style={{
-                    marginBottom: 16,
-                    background: 'rgba(230, 162, 60, 0.1)',
-                    border: '1px solid rgba(230, 162, 60, 0.2)',
-                    borderRadius: 8,
-                    padding: '8px 12px',
-                    fontSize: '12px',
-                    color: '#e6a23c',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    cursor: 'pointer'
-                }}
-                onClick={() => setShowPendingList(true)}
-            >
-                <span>⚠️ 当前有 {currentPendingTrades.length} 笔待处理交易</span>
-                <span style={{ textDecoration: 'underline' }}>查看详情 &gt;</span>
-            </div>
+          <div
+            style={{
+              marginBottom: 16,
+              background: 'rgba(230, 162, 60, 0.1)',
+              border: '1px solid rgba(230, 162, 60, 0.2)',
+              borderRadius: 8,
+              padding: '8px 12px',
+              fontSize: '12px',
+              color: '#e6a23c',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              cursor: 'pointer'
+            }}
+            onClick={() => setShowPendingList(true)}
+          >
+            <span>⚠️ 当前有 {currentPendingTrades.length} 笔待处理交易</span>
+            <span style={{ textDecoration: 'underline' }}>查看详情 &gt;</span>
+          </div>
         )}
 
         {showPendingList ? (
-            <div className="pending-list" style={{ maxHeight: '300px', overflowY: 'auto' }}>
-                <div className="pending-list-header" style={{ position: 'sticky', top: 0, zIndex: 1, background: 'rgba(15,23,42,0.95)', backdropFilter: 'blur(6px)', paddingBottom: 8, marginBottom: 8, borderBottom: '1px solid var(--border)' }}>
-                    <button
-                        className="button secondary"
-                        onClick={() => setShowPendingList(false)}
-                        style={{ padding: '4px 8px', fontSize: '12px' }}
-                    >
-                        &lt; 返回
-                    </button>
-                </div>
-                <div className="pending-list-items" style={{ paddingTop: 0 }}>
-                    {currentPendingTrades.map((trade, idx) => (
-                        <div key={trade.id || idx} style={{ background: 'rgba(255,255,255,0.05)', padding: 12, borderRadius: 8, marginBottom: 8 }}>
-                            <div className="row" style={{ justifyContent: 'space-between', marginBottom: 4 }}>
+          <div className="pending-list" style={{ maxHeight: '300px', overflowY: 'auto' }}>
+            <div className="pending-list-header" style={{ position: 'sticky', top: 0, zIndex: 1, background: 'rgba(15,23,42,0.95)', backdropFilter: 'blur(6px)', paddingBottom: 8, marginBottom: 8, borderBottom: '1px solid var(--border)' }}>
+              <button
+                className="button secondary"
+                onClick={() => setShowPendingList(false)}
+                style={{ padding: '4px 8px', fontSize: '12px' }}
+              >
+                &lt; 返回
+              </button>
+            </div>
+            <div className="pending-list-items" style={{ paddingTop: 0 }}>
+              {currentPendingTrades.map((trade, idx) => (
+                <div key={trade.id || idx} style={{ background: 'rgba(255,255,255,0.05)', padding: 12, borderRadius: 8, marginBottom: 8 }}>
+                  <div className="row" style={{ justifyContent: 'space-between', marginBottom: 4 }}>
                                 <span style={{ fontWeight: 600, fontSize: '14px', color: trade.type === 'buy' ? 'var(--danger)' : 'var(--success)' }}>
                                     {trade.type === 'buy' ? '买入' : '卖出'}
                                 </span>
-                                <span className="muted" style={{ fontSize: '12px' }}>{trade.date} {trade.isAfter3pm ? '(15:00后)' : ''}</span>
-                            </div>
-                            <div className="row" style={{ justifyContent: 'space-between', fontSize: '12px' }}>
-                                <span className="muted">份额/金额</span>
-                                <span>{trade.share ? `${trade.share} 份` : `¥${trade.amount}`}</span>
-                            </div>
-                            <div className="row" style={{ justifyContent: 'space-between', fontSize: '12px', marginTop: 4 }}>
-                                <span className="muted">状态</span>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                    <span style={{ color: '#e6a23c' }}>等待净值更新...</span>
-                                    <button
-                                        className="button secondary"
-                                        onClick={() => setRevokeTrade(trade)}
-                                        style={{
-                                            padding: '2px 8px',
-                                            fontSize: '10px',
-                                            height: 'auto',
-                                            background: 'rgba(255,255,255,0.1)',
-                                            color: 'var(--text)'
-                                        }}
-                                    >
-                                        撤销
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
+                    <span className="muted" style={{ fontSize: '12px' }}>{trade.date} {trade.isAfter3pm ? '(15:00后)' : ''}</span>
+                  </div>
+                  <div className="row" style={{ justifyContent: 'space-between', fontSize: '12px' }}>
+                    <span className="muted">份额/金额</span>
+                    <span>{trade.share ? `${trade.share} 份` : `¥${trade.amount}`}</span>
+                  </div>
+                  <div className="row" style={{ justifyContent: 'space-between', fontSize: '12px', marginTop: 4 }}>
+                    <span className="muted">状态</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ color: '#e6a23c' }}>等待净值更新...</span>
+                      <button
+                        className="button secondary"
+                        onClick={() => setRevokeTrade(trade)}
+                        style={{
+                          padding: '2px 8px',
+                          fontSize: '10px',
+                          height: 'auto',
+                          background: 'rgba(255,255,255,0.1)',
+                          color: 'var(--text)'
+                        }}
+                      >
+                        撤销
+                      </button>
+                    </div>
+                  </div>
                 </div>
+              ))}
             </div>
+          </div>
         ) : (
-            <>
-        {!showConfirm && (
-        <div style={{ marginBottom: 16 }}>
-          <div className="fund-name" style={{ fontWeight: 600, fontSize: '16px', marginBottom: 4 }}>{fund?.name}</div>
-          <div className="muted" style={{ fontSize: '12px' }}>#{fund?.code}</div>
-        </div>
-        )}
+          <>
+            {!showConfirm && (
+              <div style={{ marginBottom: 16 }}>
+                <div className="fund-name" style={{ fontWeight: 600, fontSize: '16px', marginBottom: 4 }}>{fund?.name}</div>
+                <div className="muted" style={{ fontSize: '12px' }}>#{fund?.code}</div>
+              </div>
+            )}
 
-        {showConfirm ? (
-            isBuy ? (
-            <div style={{ fontSize: '14px' }}>
-                <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: 12, padding: 16, marginBottom: 20 }}>
+            {showConfirm ? (
+              isBuy ? (
+                <div style={{ fontSize: '14px' }}>
+                  <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: 12, padding: 16, marginBottom: 20 }}>
                     <div className="row" style={{ justifyContent: 'space-between', marginBottom: 8 }}>
-                        <span className="muted">基金名称</span>
-                        <span style={{ fontWeight: 600 }}>{fund?.name}</span>
+                      <span className="muted">基金名称</span>
+                      <span style={{ fontWeight: 600 }}>{fund?.name}</span>
                     </div>
                     <div className="row" style={{ justifyContent: 'space-between', marginBottom: 8 }}>
-                        <span className="muted">买入金额</span>
-                        <span>¥{Number(amount).toFixed(2)}</span>
+                      <span className="muted">买入金额</span>
+                      <span>¥{Number(amount).toFixed(2)}</span>
                     </div>
                     <div className="row" style={{ justifyContent: 'space-between', marginBottom: 8 }}>
-                        <span className="muted">买入费率</span>
-                        <span>{Number(feeRate).toFixed(2)}%</span>
-                    </div>
-                     <div className="row" style={{ justifyContent: 'space-between', marginBottom: 8 }}>
-                        <span className="muted">参考净值</span>
-                        <span>{loadingPrice ? '查询中...' : (price ? `¥${Number(price).toFixed(4)}` : '待查询 (加入队列)')}</span>
+                      <span className="muted">买入费率</span>
+                      <span>{Number(feeRate).toFixed(2)}%</span>
                     </div>
                     <div className="row" style={{ justifyContent: 'space-between', marginBottom: 8 }}>
-                        <span className="muted">预估份额</span>
-                        <span>{calcShare === '待确认' ? '待确认' : `${Number(calcShare).toFixed(2)} 份`}</span>
+                      <span className="muted">参考净值</span>
+                      <span>{loadingPrice ? '查询中...' : (price ? `¥${Number(price).toFixed(4)}` : '待查询 (加入队列)')}</span>
                     </div>
                     <div className="row" style={{ justifyContent: 'space-between', marginBottom: 8 }}>
-                        <span className="muted">买入日期</span>
-                        <span>{date}</span>
+                      <span className="muted">预估份额</span>
+                      <span>{calcShare === '待确认' ? '待确认' : `${Number(calcShare).toFixed(2)} 份`}</span>
+                    </div>
+                    <div className="row" style={{ justifyContent: 'space-between', marginBottom: 8 }}>
+                      <span className="muted">买入日期</span>
+                      <span>{date}</span>
                     </div>
                     <div className="row" style={{ justifyContent: 'space-between', marginBottom: 8, borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 8 }}>
-                        <span className="muted">交易时段</span>
-                        <span>{isAfter3pm ? '15:00后' : '15:00前'}</span>
+                      <span className="muted">交易时段</span>
+                      <span>{isAfter3pm ? '15:00后' : '15:00前'}</span>
                     </div>
                     <div className="muted" style={{ fontSize: '12px', textAlign: 'right', marginTop: 4 }}>
-                        {loadingPrice ? '正在获取该日净值...' : `*基于${price === getEstimatePrice() ? '当前净值/估值' : '当日净值'}测算`}
+                      {loadingPrice ? '正在获取该日净值...' : `*基于${price === getEstimatePrice() ? '当前净值/估值' : '当日净值'}测算`}
                     </div>
-                </div>
-
-                {holding && calcShare !== '待确认' && (
-                    <div style={{ marginBottom: 20 }}>
-                        <div className="muted" style={{ marginBottom: 8, fontSize: '12px' }}>持仓变化预览</div>
-                        <div className="row" style={{ gap: 12 }}>
-                            <div style={{ flex: 1, background: 'rgba(0,0,0,0.2)', padding: 12, borderRadius: 8 }}>
-                                <div className="muted" style={{ fontSize: '12px', marginBottom: 4 }}>持有份额</div>
-                                <div style={{ fontSize: '12px' }}>
-                                    <span style={{ opacity: 0.7 }}>{holding.share.toFixed(2)}</span>
-                                    <span style={{ margin: '0 4px' }}>→</span>
-                                    <span style={{ fontWeight: 600 }}>{(holding.share + Number(calcShare)).toFixed(2)}</span>
-                                </div>
-                            </div>
-                            {price ? (
-                                <div style={{ flex: 1, background: 'rgba(0,0,0,0.2)', padding: 12, borderRadius: 8 }}>
-                                    <div className="muted" style={{ fontSize: '12px', marginBottom: 4 }}>持有市值 (估)</div>
-                                    <div style={{ fontSize: '12px' }}>
-                                        <span style={{ opacity: 0.7 }}>¥{(holding.share * Number(price)).toFixed(2)}</span>
-                                        <span style={{ margin: '0 4px' }}>→</span>
-                                        <span style={{ fontWeight: 600 }}>¥{((holding.share + Number(calcShare)) * Number(price)).toFixed(2)}</span>
-                                    </div>
-                                </div>
-                            ) : null}
-                        </div>
-                    </div>
-                )}
-
-                <div className="row" style={{ gap: 12 }}>
-                    <button
-                        type="button"
-                        className="button secondary"
-                        onClick={() => setShowConfirm(false)}
-                        style={{ flex: 1, background: 'rgba(255,255,255,0.05)', color: 'var(--text)' }}
-                    >
-                        返回修改
-                    </button>
-                    <button
-                        type="button"
-                        className="button"
-                        onClick={handleFinalConfirm}
-                        disabled={loadingPrice}
-                        style={{ flex: 1, background: 'var(--primary)', opacity: loadingPrice ? 0.6 : 1, color: '#05263b' }}
-                    >
-                        {loadingPrice ? '请稍候' : (price ? '确认买入' : '加入待处理队列')}
-                    </button>
-                </div>
-            </div>
-            ) : (
-            <div style={{ fontSize: '14px' }}>
-                <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: 12, padding: 16, marginBottom: 20 }}>
-                    <div className="row" style={{ justifyContent: 'space-between', marginBottom: 8 }}>
-                        <span className="muted">基金名称</span>
-                        <span style={{ fontWeight: 600 }}>{fund?.name}</span>
-                    </div>
-                    <div className="row" style={{ justifyContent: 'space-between', marginBottom: 8 }}>
-                        <span className="muted">卖出份额</span>
-                        <span>{sellShare.toFixed(2)} 份</span>
-                    </div>
-                     <div className="row" style={{ justifyContent: 'space-between', marginBottom: 8 }}>
-                        <span className="muted">预估卖出单价</span>
-                        <span>{loadingPrice ? '查询中...' : (price ? `¥${sellPrice.toFixed(4)}` : '待查询 (加入队列)')}</span>
-                    </div>
-                    <div className="row" style={{ justifyContent: 'space-between', marginBottom: 8 }}>
-                        <span className="muted">卖出费率/费用</span>
-                        <span>{feeMode === 'rate' ? `${feeValue}%` : `¥${feeValue}`}</span>
-                    </div>
-                    <div className="row" style={{ justifyContent: 'space-between', marginBottom: 8 }}>
-                        <span className="muted">预估手续费</span>
-                        <span>{price ? `¥${sellFee.toFixed(2)}` : '待计算'}</span>
-                    </div>
-                    <div className="row" style={{ justifyContent: 'space-between', marginBottom: 8 }}>
-                        <span className="muted">卖出日期</span>
-                        <span>{date}</span>
-                    </div>
-                     <div className="row" style={{ justifyContent: 'space-between', marginBottom: 8, borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 8 }}>
-                        <span className="muted">预计回款</span>
-                        <span style={{ color: 'var(--danger)', fontWeight: 700 }}>{loadingPrice ? '计算中...' : (price ? `¥${estimatedReturn.toFixed(2)}` : '待计算')}</span>
-                    </div>
-                    <div className="muted" style={{ fontSize: '12px', textAlign: 'right', marginTop: 4 }}>
-                        {loadingPrice ? '正在获取该日净值...' : `*基于${price === getEstimatePrice() ? '当前净值/估值' : '当日净值'}测算`}
-                    </div>
-                </div>
-
-                {holding && (
-                    <div style={{ marginBottom: 20 }}>
-                        <div className="muted" style={{ marginBottom: 8, fontSize: '12px' }}>持仓变化预览</div>
-                        <div className="row" style={{ gap: 12 }}>
-                            <div style={{ flex: 1, background: 'rgba(0,0,0,0.2)', padding: 12, borderRadius: 8 }}>
-                                <div className="muted" style={{ fontSize: '12px', marginBottom: 4 }}>持有份额</div>
-                                <div style={{ fontSize: '12px' }}>
-                                    <span style={{ opacity: 0.7 }}>{holding.share.toFixed(2)}</span>
-                                    <span style={{ margin: '0 4px' }}>→</span>
-                                    <span style={{ fontWeight: 600 }}>{(holding.share - sellShare).toFixed(2)}</span>
-                                </div>
-                            </div>
-                            {price ? (
-                                <div style={{ flex: 1, background: 'rgba(0,0,0,0.2)', padding: 12, borderRadius: 8 }}>
-                                    <div className="muted" style={{ fontSize: '12px', marginBottom: 4 }}>持有市值 (估)</div>
-                                    <div style={{ fontSize: '12px' }}>
-                                        <span style={{ opacity: 0.7 }}>¥{(holding.share * sellPrice).toFixed(2)}</span>
-                                        <span style={{ margin: '0 4px' }}>→</span>
-                                        <span style={{ fontWeight: 600 }}>¥{((holding.share - sellShare) * sellPrice).toFixed(2)}</span>
-                                    </div>
-                                </div>
-                            ) : null}
-                        </div>
-                    </div>
-                )}
-
-                <div className="row" style={{ gap: 12 }}>
-                    <button
-                        type="button"
-                        className="button secondary"
-                        onClick={() => setShowConfirm(false)}
-                        style={{ flex: 1, background: 'rgba(255,255,255,0.05)', color: 'var(--text)' }}
-                    >
-                        返回修改
-                    </button>
-                    <button
-                        type="button"
-                        className="button"
-                        onClick={handleFinalConfirm}
-                        disabled={loadingPrice}
-                        style={{ flex: 1, background: 'var(--danger)', opacity: loadingPrice ? 0.6 : 1 }}
-                    >
-                        {loadingPrice ? '请稍候' : (price ? '确认卖出' : '加入待处理队列')}
-                    </button>
-                </div>
-            </div>
-            )
-        ) : (
-        <form onSubmit={handleSubmit}>
-          {isBuy ? (
-            <>
-              <div className="form-group" style={{ marginBottom: 16 }}>
-                <label className="muted" style={{ display: 'block', marginBottom: 8, fontSize: '14px' }}>
-                  加仓金额 (¥) <span style={{ color: 'var(--danger)' }}>*</span>
-                </label>
-                <div style={{ border: !amount ? '1px solid var(--danger)' : '1px solid var(--border)', borderRadius: 12 }}>
-                  <NumericInput
-                    value={amount}
-                    onChange={setAmount}
-                    step={100}
-                    min={0}
-                    placeholder="请输入加仓金额"
-                  />
-                </div>
-              </div>
-
-              <div className="row" style={{ gap: 12, marginBottom: 16 }}>
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label className="muted" style={{ display: 'block', marginBottom: 8, fontSize: '14px' }}>
-                    买入费率 (%) <span style={{ color: 'var(--danger)' }}>*</span>
-                  </label>
-                  <div style={{ border: !feeRate ? '1px solid var(--danger)' : '1px solid var(--border)', borderRadius: 12 }}>
-                    <NumericInput
-                      value={feeRate}
-                      onChange={setFeeRate}
-                      step={0.01}
-                      min={0}
-                      placeholder="0.12"
-                    />
                   </div>
-                </div>
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label className="muted" style={{ display: 'block', marginBottom: 8, fontSize: '14px' }}>
-                    加仓日期 <span style={{ color: 'var(--danger)' }}>*</span>
-                  </label>
-                  <DatePicker value={date} onChange={setDate} />
-                </div>
-              </div>
 
-              <div className="form-group" style={{ marginBottom: 12 }}>
-                <label className="muted" style={{ display: 'block', marginBottom: 8, fontSize: '14px' }}>
-                  交易时段
-                </label>
-                <div className="row" style={{ gap: 8, background: 'rgba(0,0,0,0.2)', borderRadius: '8px', padding: '4px' }}>
-                  <button
-                    type="button"
-                    onClick={() => setIsAfter3pm(false)}
-                    style={{
-                      flex: 1,
-                      border: 'none',
-                      background: !isAfter3pm ? 'var(--primary)' : 'transparent',
-                      color: !isAfter3pm ? '#05263b' : 'var(--muted)',
-                      borderRadius: '6px',
-                      fontSize: '12px',
-                      cursor: 'pointer',
-                      padding: '6px 8px'
-                    }}
-                  >
-                    15:00前
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setIsAfter3pm(true)}
-                    style={{
-                      flex: 1,
-                      border: 'none',
-                      background: isAfter3pm ? 'var(--primary)' : 'transparent',
-                      color: isAfter3pm ? '#05263b' : 'var(--muted)',
-                      borderRadius: '6px',
-                      fontSize: '12px',
-                      cursor: 'pointer',
-                      padding: '6px 8px'
-                    }}
-                  >
-                    15:00后
-                  </button>
-                </div>
-              </div>
-
-              <div style={{ marginBottom: 12, fontSize: '12px' }}>
-                {loadingPrice ? (
-                    <span className="muted">正在查询净值数据...</span>
-                ) : price === 0 ? null : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                        <span className="muted">参考净值: {Number(price).toFixed(4)}</span>
+                  {holding && calcShare !== '待确认' && (
+                    <div style={{ marginBottom: 20 }}>
+                      <div className="muted" style={{ marginBottom: 8, fontSize: '12px' }}>持仓变化预览</div>
+                      <div className="row" style={{ gap: 12 }}>
+                        <div style={{ flex: 1, background: 'rgba(0,0,0,0.2)', padding: 12, borderRadius: 8 }}>
+                          <div className="muted" style={{ fontSize: '12px', marginBottom: 4 }}>持有份额</div>
+                          <div style={{ fontSize: '12px' }}>
+                            <span style={{ opacity: 0.7 }}>{holding.share.toFixed(2)}</span>
+                            <span style={{ margin: '0 4px' }}>→</span>
+                            <span style={{ fontWeight: 600 }}>{(holding.share + Number(calcShare)).toFixed(2)}</span>
+                          </div>
+                        </div>
+                        {price ? (
+                          <div style={{ flex: 1, background: 'rgba(0,0,0,0.2)', padding: 12, borderRadius: 8 }}>
+                            <div className="muted" style={{ fontSize: '12px', marginBottom: 4 }}>持有市值 (估)</div>
+                            <div style={{ fontSize: '12px' }}>
+                              <span style={{ opacity: 0.7 }}>¥{(holding.share * Number(price)).toFixed(2)}</span>
+                              <span style={{ margin: '0 4px' }}>→</span>
+                              <span style={{ fontWeight: 600 }}>¥{((holding.share + Number(calcShare)) * Number(price)).toFixed(2)}</span>
+                            </div>
+                          </div>
+                        ) : null}
+                      </div>
                     </div>
-                )}
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="form-group" style={{ marginBottom: 16 }}>
-                <label className="muted" style={{ display: 'block', marginBottom: 8, fontSize: '14px' }}>
-                  卖出份额 <span style={{ color: 'var(--danger)' }}>*</span>
-                </label>
-                <div style={{ border: !share ? '1px solid var(--danger)' : '1px solid var(--border)', borderRadius: 12 }}>
-                  <NumericInput
-                    value={share}
-                    onChange={setShare}
-                    step={1}
-                    min={0}
-                    placeholder={holding ? `最多可卖 ${availableShare.toFixed(2)} 份` : "请输入卖出份额"}
-                  />
-                </div>
-                {holding && holding.share > 0 && (
-                   <div className="row" style={{ gap: 8, marginTop: 8 }}>
-                       {[
-                           { label: '1/4', value: 0.25 },
-                           { label: '1/3', value: 1/3 },
-                           { label: '1/2', value: 0.5 },
-                           { label: '全部', value: 1 }
-                       ].map((opt) => (
-                           <button
-                               key={opt.label}
-                               type="button"
-                               onClick={() => handleSetShareFraction(opt.value)}
-                               style={{
-                                   flex: 1,
-                                   padding: '4px 8px',
-                                   fontSize: '12px',
-                                   background: 'rgba(255,255,255,0.1)',
-                                   border: 'none',
-                                   borderRadius: '4px',
-                                   color: 'var(--text)',
-                                   cursor: 'pointer'
-                               }}
-                           >
-                               {opt.label}
-                           </button>
-                       ))}
-                   </div>
-                )}
-                 {holding && (
-                    <div className="muted" style={{ fontSize: '12px', marginTop: 6 }}>
-                        当前持仓: {holding.share.toFixed(2)} 份 {pendingSellShare > 0 && <span style={{color: '#e6a23c', marginLeft: 8}}>冻结: {pendingSellShare.toFixed(2)} 份</span>}
-                    </div>
-                )}
-              </div>
+                  )}
 
-              <div className="row" style={{ gap: 12, marginBottom: 16 }}>
-                <div className="form-group" style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                    <label className="muted" style={{ fontSize: '14px' }}>
-                      {feeMode === 'rate' ? '卖出费率 (%)' : '卖出费用 (¥)'}
-                    </label>
+                  <div className="row" style={{ gap: 12 }}>
                     <button
                       type="button"
-                      onClick={() => {
-                          setFeeMode(m => m === 'rate' ? 'amount' : 'rate');
-                          setFeeValue('0');
-                      }}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        color: 'var(--primary)',
-                        fontSize: '12px',
-                        cursor: 'pointer',
-                        padding: 0
-                      }}
+                      className="button secondary"
+                      onClick={() => setShowConfirm(false)}
+                      style={{ flex: 1, background: 'rgba(255,255,255,0.05)', color: 'var(--text)' }}
                     >
-                      切换为{feeMode === 'rate' ? '金额' : '费率'}
+                      返回修改
+                    </button>
+                    <button
+                      type="button"
+                      className="button"
+                      onClick={handleFinalConfirm}
+                      disabled={loadingPrice}
+                      style={{ flex: 1, background: 'var(--primary)', opacity: loadingPrice ? 0.6 : 1, color: '#05263b' }}
+                    >
+                      {loadingPrice ? '请稍候' : (price ? '确认买入' : '加入待处理队列')}
                     </button>
                   </div>
-                  <div style={{ border: '1px solid var(--border)', borderRadius: 12 }}>
-                    <NumericInput
-                      value={feeValue}
-                      onChange={setFeeValue}
-                      step={feeMode === 'rate' ? 0.01 : 1}
-                      min={0}
-                      placeholder={feeMode === 'rate' ? "0.00" : "0.00"}
-                    />
+                </div>
+              ) : (
+                <div style={{ fontSize: '14px' }}>
+                  <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: 12, padding: 16, marginBottom: 20 }}>
+                    <div className="row" style={{ justifyContent: 'space-between', marginBottom: 8 }}>
+                      <span className="muted">基金名称</span>
+                      <span style={{ fontWeight: 600 }}>{fund?.name}</span>
+                    </div>
+                    <div className="row" style={{ justifyContent: 'space-between', marginBottom: 8 }}>
+                      <span className="muted">卖出份额</span>
+                      <span>{sellShare.toFixed(2)} 份</span>
+                    </div>
+                    <div className="row" style={{ justifyContent: 'space-between', marginBottom: 8 }}>
+                      <span className="muted">预估卖出单价</span>
+                      <span>{loadingPrice ? '查询中...' : (price ? `¥${sellPrice.toFixed(4)}` : '待查询 (加入队列)')}</span>
+                    </div>
+                    <div className="row" style={{ justifyContent: 'space-between', marginBottom: 8 }}>
+                      <span className="muted">卖出费率/费用</span>
+                      <span>{feeMode === 'rate' ? `${feeValue}%` : `¥${feeValue}`}</span>
+                    </div>
+                    <div className="row" style={{ justifyContent: 'space-between', marginBottom: 8 }}>
+                      <span className="muted">预估手续费</span>
+                      <span>{price ? `¥${sellFee.toFixed(2)}` : '待计算'}</span>
+                    </div>
+                    <div className="row" style={{ justifyContent: 'space-between', marginBottom: 8 }}>
+                      <span className="muted">卖出日期</span>
+                      <span>{date}</span>
+                    </div>
+                    <div className="row" style={{ justifyContent: 'space-between', marginBottom: 8, borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 8 }}>
+                      <span className="muted">预计回款</span>
+                      <span style={{ color: 'var(--danger)', fontWeight: 700 }}>{loadingPrice ? '计算中...' : (price ? `¥${estimatedReturn.toFixed(2)}` : '待计算')}</span>
+                    </div>
+                    <div className="muted" style={{ fontSize: '12px', textAlign: 'right', marginTop: 4 }}>
+                      {loadingPrice ? '正在获取该日净值...' : `*基于${price === getEstimatePrice() ? '当前净值/估值' : '当日净值'}测算`}
+                    </div>
+                  </div>
+
+                  {holding && (
+                    <div style={{ marginBottom: 20 }}>
+                      <div className="muted" style={{ marginBottom: 8, fontSize: '12px' }}>持仓变化预览</div>
+                      <div className="row" style={{ gap: 12 }}>
+                        <div style={{ flex: 1, background: 'rgba(0,0,0,0.2)', padding: 12, borderRadius: 8 }}>
+                          <div className="muted" style={{ fontSize: '12px', marginBottom: 4 }}>持有份额</div>
+                          <div style={{ fontSize: '12px' }}>
+                            <span style={{ opacity: 0.7 }}>{holding.share.toFixed(2)}</span>
+                            <span style={{ margin: '0 4px' }}>→</span>
+                            <span style={{ fontWeight: 600 }}>{(holding.share - sellShare).toFixed(2)}</span>
+                          </div>
+                        </div>
+                        {price ? (
+                          <div style={{ flex: 1, background: 'rgba(0,0,0,0.2)', padding: 12, borderRadius: 8 }}>
+                            <div className="muted" style={{ fontSize: '12px', marginBottom: 4 }}>持有市值 (估)</div>
+                            <div style={{ fontSize: '12px' }}>
+                              <span style={{ opacity: 0.7 }}>¥{(holding.share * sellPrice).toFixed(2)}</span>
+                              <span style={{ margin: '0 4px' }}>→</span>
+                              <span style={{ fontWeight: 600 }}>¥{((holding.share - sellShare) * sellPrice).toFixed(2)}</span>
+                            </div>
+                          </div>
+                        ) : null}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="row" style={{ gap: 12 }}>
+                    <button
+                      type="button"
+                      className="button secondary"
+                      onClick={() => setShowConfirm(false)}
+                      style={{ flex: 1, background: 'rgba(255,255,255,0.05)', color: 'var(--text)' }}
+                    >
+                      返回修改
+                    </button>
+                    <button
+                      type="button"
+                      className="button"
+                      onClick={handleFinalConfirm}
+                      disabled={loadingPrice}
+                      style={{ flex: 1, background: 'var(--danger)', opacity: loadingPrice ? 0.6 : 1 }}
+                    >
+                      {loadingPrice ? '请稍候' : (price ? '确认卖出' : '加入待处理队列')}
+                    </button>
                   </div>
                 </div>
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label className="muted" style={{ display: 'block', marginBottom: 8, fontSize: '14px' }}>
-                    卖出日期 <span style={{ color: 'var(--danger)' }}>*</span>
-                  </label>
-                  <DatePicker value={date} onChange={setDate} />
-                </div>
-              </div>
-
-              <div className="form-group" style={{ marginBottom: 12 }}>
-                <label className="muted" style={{ display: 'block', marginBottom: 8, fontSize: '14px' }}>
-                  交易时段
-                </label>
-                <div className="row" style={{ gap: 8, background: 'rgba(0,0,0,0.2)', borderRadius: '8px', padding: '4px' }}>
-                  <button
-                    type="button"
-                    onClick={() => setIsAfter3pm(false)}
-                    style={{
-                      flex: 1,
-                      border: 'none',
-                      background: !isAfter3pm ? 'var(--primary)' : 'transparent',
-                      color: !isAfter3pm ? '#05263b' : 'var(--muted)',
-                      borderRadius: '6px',
-                      fontSize: '12px',
-                      cursor: 'pointer',
-                      padding: '6px 8px'
-                    }}
-                  >
-                    15:00前
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setIsAfter3pm(true)}
-                    style={{
-                      flex: 1,
-                      border: 'none',
-                      background: isAfter3pm ? 'var(--primary)' : 'transparent',
-                      color: isAfter3pm ? '#05263b' : 'var(--muted)',
-                      borderRadius: '6px',
-                      fontSize: '12px',
-                      cursor: 'pointer',
-                      padding: '6px 8px'
-                    }}
-                  >
-                    15:00后
-                  </button>
-                </div>
-              </div>
-
-              <div style={{ marginBottom: 12, fontSize: '12px' }}>
-                {loadingPrice ? (
-                    <span className="muted">正在查询净值数据...</span>
-                ) : price === 0 ? null : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                        <span className="muted">参考净值: {price.toFixed(4)}</span>
+              )
+            ) : (
+              <form onSubmit={handleSubmit}>
+                {isBuy ? (
+                  <>
+                    <div className="form-group" style={{ marginBottom: 16 }}>
+                      <label className="muted" style={{ display: 'block', marginBottom: 8, fontSize: '14px' }}>
+                        加仓金额 (¥) <span style={{ color: 'var(--danger)' }}>*</span>
+                      </label>
+                      <div style={{ border: !amount ? '1px solid var(--danger)' : '1px solid var(--border)', borderRadius: 12 }}>
+                        <NumericInput
+                          value={amount}
+                          onChange={setAmount}
+                          step={100}
+                          min={0}
+                          placeholder="请输入加仓金额"
+                        />
+                      </div>
                     </div>
-                )}
-              </div>
-            </>
-          )}
 
-          <div className="row" style={{ gap: 12, marginTop: 12 }}>
-            <button type="button" className="button secondary" onClick={onClose} style={{ flex: 1, background: 'rgba(255,255,255,0.05)', color: 'var(--text)' }}>取消</button>
-            <button
-              type="submit"
-              className="button"
-              disabled={!isValid || loadingPrice}
-              style={{ flex: 1, opacity: (!isValid || loadingPrice) ? 0.6 : 1 }}
-            >
-              确定
-            </button>
-          </div>
-        </form>
-      )}
-              </>
+                    <div className="row" style={{ gap: 12, marginBottom: 16 }}>
+                      <div className="form-group" style={{ flex: 1 }}>
+                        <label className="muted" style={{ display: 'block', marginBottom: 8, fontSize: '14px' }}>
+                          买入费率 (%) <span style={{ color: 'var(--danger)' }}>*</span>
+                        </label>
+                        <div style={{ border: !feeRate ? '1px solid var(--danger)' : '1px solid var(--border)', borderRadius: 12 }}>
+                          <NumericInput
+                            value={feeRate}
+                            onChange={setFeeRate}
+                            step={0.01}
+                            min={0}
+                            placeholder="0.12"
+                          />
+                        </div>
+                      </div>
+                      <div className="form-group" style={{ flex: 1 }}>
+                        <label className="muted" style={{ display: 'block', marginBottom: 8, fontSize: '14px' }}>
+                          加仓日期 <span style={{ color: 'var(--danger)' }}>*</span>
+                        </label>
+                        <DatePicker value={date} onChange={setDate} />
+                      </div>
+                    </div>
+
+                    <div className="form-group" style={{ marginBottom: 12 }}>
+                      <label className="muted" style={{ display: 'block', marginBottom: 8, fontSize: '14px' }}>
+                        交易时段
+                      </label>
+                      <div className="row" style={{ gap: 8, background: 'rgba(0,0,0,0.2)', borderRadius: '8px', padding: '4px' }}>
+                        <button
+                          type="button"
+                          onClick={() => setIsAfter3pm(false)}
+                          style={{
+                            flex: 1,
+                            border: 'none',
+                            background: !isAfter3pm ? 'var(--primary)' : 'transparent',
+                            color: !isAfter3pm ? '#05263b' : 'var(--muted)',
+                            borderRadius: '6px',
+                            fontSize: '12px',
+                            cursor: 'pointer',
+                            padding: '6px 8px'
+                          }}
+                        >
+                          15:00前
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setIsAfter3pm(true)}
+                          style={{
+                            flex: 1,
+                            border: 'none',
+                            background: isAfter3pm ? 'var(--primary)' : 'transparent',
+                            color: isAfter3pm ? '#05263b' : 'var(--muted)',
+                            borderRadius: '6px',
+                            fontSize: '12px',
+                            cursor: 'pointer',
+                            padding: '6px 8px'
+                          }}
+                        >
+                          15:00后
+                        </button>
+                      </div>
+                    </div>
+
+                    <div style={{ marginBottom: 12, fontSize: '12px' }}>
+                      {loadingPrice ? (
+                        <span className="muted">正在查询净值数据...</span>
+                      ) : price === 0 ? null : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                          <span className="muted">参考净值: {Number(price).toFixed(4)}</span>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="form-group" style={{ marginBottom: 16 }}>
+                      <label className="muted" style={{ display: 'block', marginBottom: 8, fontSize: '14px' }}>
+                        卖出份额 <span style={{ color: 'var(--danger)' }}>*</span>
+                      </label>
+                      <div style={{ border: !share ? '1px solid var(--danger)' : '1px solid var(--border)', borderRadius: 12 }}>
+                        <NumericInput
+                          value={share}
+                          onChange={setShare}
+                          step={1}
+                          min={0}
+                          placeholder={holding ? `最多可卖 ${availableShare.toFixed(2)} 份` : "请输入卖出份额"}
+                        />
+                      </div>
+                      {holding && holding.share > 0 && (
+                        <div className="row" style={{ gap: 8, marginTop: 8 }}>
+                          {[
+                            { label: '1/4', value: 0.25 },
+                            { label: '1/3', value: 1/3 },
+                            { label: '1/2', value: 0.5 },
+                            { label: '全部', value: 1 }
+                          ].map((opt) => (
+                            <button
+                              key={opt.label}
+                              type="button"
+                              onClick={() => handleSetShareFraction(opt.value)}
+                              style={{
+                                flex: 1,
+                                padding: '4px 8px',
+                                fontSize: '12px',
+                                background: 'rgba(255,255,255,0.1)',
+                                border: 'none',
+                                borderRadius: '4px',
+                                color: 'var(--text)',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              {opt.label}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      {holding && (
+                        <div className="muted" style={{ fontSize: '12px', marginTop: 6 }}>
+                          当前持仓: {holding.share.toFixed(2)} 份 {pendingSellShare > 0 && <span style={{color: '#e6a23c', marginLeft: 8}}>冻结: {pendingSellShare.toFixed(2)} 份</span>}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="row" style={{ gap: 12, marginBottom: 16 }}>
+                      <div className="form-group" style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                          <label className="muted" style={{ fontSize: '14px' }}>
+                            {feeMode === 'rate' ? '卖出费率 (%)' : '卖出费用 (¥)'}
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setFeeMode(m => m === 'rate' ? 'amount' : 'rate');
+                              setFeeValue('0');
+                            }}
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              color: 'var(--primary)',
+                              fontSize: '12px',
+                              cursor: 'pointer',
+                              padding: 0
+                            }}
+                          >
+                            切换为{feeMode === 'rate' ? '金额' : '费率'}
+                          </button>
+                        </div>
+                        <div style={{ border: '1px solid var(--border)', borderRadius: 12 }}>
+                          <NumericInput
+                            value={feeValue}
+                            onChange={setFeeValue}
+                            step={feeMode === 'rate' ? 0.01 : 1}
+                            min={0}
+                            placeholder={feeMode === 'rate' ? "0.00" : "0.00"}
+                          />
+                        </div>
+                      </div>
+                      <div className="form-group" style={{ flex: 1 }}>
+                        <label className="muted" style={{ display: 'block', marginBottom: 8, fontSize: '14px' }}>
+                          卖出日期 <span style={{ color: 'var(--danger)' }}>*</span>
+                        </label>
+                        <DatePicker value={date} onChange={setDate} />
+                      </div>
+                    </div>
+
+                    <div className="form-group" style={{ marginBottom: 12 }}>
+                      <label className="muted" style={{ display: 'block', marginBottom: 8, fontSize: '14px' }}>
+                        交易时段
+                      </label>
+                      <div className="row" style={{ gap: 8, background: 'rgba(0,0,0,0.2)', borderRadius: '8px', padding: '4px' }}>
+                        <button
+                          type="button"
+                          onClick={() => setIsAfter3pm(false)}
+                          style={{
+                            flex: 1,
+                            border: 'none',
+                            background: !isAfter3pm ? 'var(--primary)' : 'transparent',
+                            color: !isAfter3pm ? '#05263b' : 'var(--muted)',
+                            borderRadius: '6px',
+                            fontSize: '12px',
+                            cursor: 'pointer',
+                            padding: '6px 8px'
+                          }}
+                        >
+                          15:00前
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setIsAfter3pm(true)}
+                          style={{
+                            flex: 1,
+                            border: 'none',
+                            background: isAfter3pm ? 'var(--primary)' : 'transparent',
+                            color: isAfter3pm ? '#05263b' : 'var(--muted)',
+                            borderRadius: '6px',
+                            fontSize: '12px',
+                            cursor: 'pointer',
+                            padding: '6px 8px'
+                          }}
+                        >
+                          15:00后
+                        </button>
+                      </div>
+                    </div>
+
+                    <div style={{ marginBottom: 12, fontSize: '12px' }}>
+                      {loadingPrice ? (
+                        <span className="muted">正在查询净值数据...</span>
+                      ) : price === 0 ? null : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                          <span className="muted">参考净值: {price.toFixed(4)}</span>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+
+                <div className="row" style={{ gap: 12, marginTop: 12 }}>
+                  <button type="button" className="button secondary" onClick={onClose} style={{ flex: 1, background: 'rgba(255,255,255,0.05)', color: 'var(--text)' }}>取消</button>
+                  <button
+                    type="submit"
+                    className="button"
+                    disabled={!isValid || loadingPrice}
+                    style={{ flex: 1, opacity: (!isValid || loadingPrice) ? 0.6 : 1 }}
+                  >
+                    确定
+                  </button>
+                </div>
+              </form>
             )}
+          </>
+        )}
       </motion.div>
       <AnimatePresence>
         {revokeTrade && (
@@ -939,8 +963,8 @@ function TradeModal({ type, fund, holding, onClose, onConfirm, pendingTrades = [
             title="撤销交易"
             message={`确定要撤销这笔 ${revokeTrade.share ? `${revokeTrade.share}份` : `¥${revokeTrade.amount}`} 的${revokeTrade.type === 'buy' ? '买入' : '卖出'}申请吗？`}
             onConfirm={() => {
-                onDeletePending?.(revokeTrade.id);
-                setRevokeTrade(null);
+              onDeletePending?.(revokeTrade.id);
+              setRevokeTrade(null);
             }}
             onCancel={() => setRevokeTrade(null)}
             confirmText="确认撤销"
@@ -2446,6 +2470,182 @@ export default function HomePage() {
   };
 
   const [updateModalOpen, setUpdateModalOpen] = useState(false);
+  const [scanModalOpen, setScanModalOpen] = useState(false); // 扫描弹窗
+  const [scanConfirmModalOpen, setScanConfirmModalOpen] = useState(false); // 扫描确认弹窗
+  const [scannedFunds, setScannedFunds] = useState([]); // 扫描到的基金
+  const [selectedScannedCodes, setSelectedScannedCodes] = useState(new Set()); // 选中的扫描代码
+  const [isScanning, setIsScanning] = useState(false);
+  const [scanProgress, setScanProgress] = useState({ stage: 'ocr', current: 0, total: 0 }); // stage: ocr | verify
+  const abortScanRef = useRef(false); // 终止扫描标记
+  const fileInputRef = useRef(null);
+  
+  // 引入 Tesseract
+  const [Tesseract, setTesseract] = useState(null);
+  useEffect(() => {
+    import('tesseract.js').then(mod => setTesseract(mod.default));
+  }, []);
+
+  const handleScanClick = () => {
+    setScanModalOpen(true);
+  };
+  
+  const handleScanPick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const cancelScan = () => {
+    abortScanRef.current = true;
+    setIsScanning(false);
+    setScanProgress({ stage: 'ocr', current: 0, total: 0 });
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleFilesUpload = async (event) => {
+    const files = Array.from(event.target.files || []);
+    if (!files.length) return;
+    if (!Tesseract) {
+      alert('OCR 组件加载中，请稍后重试');
+      return;
+    }
+
+    setIsScanning(true);
+    setScanModalOpen(false); // 关闭选择弹窗
+    abortScanRef.current = false;
+    setScanProgress({ stage: 'ocr', current: 0, total: files.length });
+    
+    try {
+      const allCodes = new Set();
+      for (let i = 0; i < files.length; i++) {
+        if (abortScanRef.current) break;
+        
+        const f = files[i];
+        // 更新进度：正在处理第 i+1 张
+        setScanProgress(prev => ({ ...prev, current: i + 1 }));
+        
+        const { data: { text } } = await Tesseract.recognize(f, 'eng'); // 这里使用英文解析能提升速度
+        const matches = text.match(/\b\d{6}\b/g) || [];
+        matches.forEach(c => allCodes.add(c));
+      }
+
+      if (abortScanRef.current) {
+        // 如果是手动终止，不显示结果弹窗
+        return;
+      }
+
+      const codes = Array.from(allCodes).sort();
+      setScanProgress({ stage: 'verify', current: 0, total: codes.length });
+
+      const existingCodes = new Set(funds.map(f => f.code));
+      const results = [];
+      for (let i = 0; i < codes.length; i++) {
+        if (abortScanRef.current) break;
+        const code = codes[i];
+        setScanProgress(prev => ({ ...prev, current: i + 1 }));
+
+        let found = null;
+        try {
+          const list = await searchFunds(code);
+          found = Array.isArray(list) ? list.find(d => d.CODE === code) : null;
+        } catch (e) {
+          found = null;
+        }
+
+        const alreadyAdded = existingCodes.has(code);
+        const ok = !!found && !alreadyAdded;
+        results.push({
+          code,
+          name: found ? (found.NAME || found.SHORTNAME || '') : '',
+          status: alreadyAdded ? 'added' : (ok ? 'ok' : 'invalid')
+        });
+      }
+
+      if (abortScanRef.current) {
+        return;
+      }
+
+      setScannedFunds(results);
+      setSelectedScannedCodes(new Set(results.filter(r => r.status === 'ok').map(r => r.code)));
+      setScanConfirmModalOpen(true);
+    } catch (err) {
+      if (!abortScanRef.current) {
+        console.error('OCR Error:', err);
+        showToast('图片识别失败，请重试或更换更清晰的截图', 'error');
+      }
+    } finally {
+      setIsScanning(false);
+      setScanProgress({ stage: 'ocr', current: 0, total: 0 });
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const toggleScannedCode = (code) => {
+    setSelectedScannedCodes(prev => {
+      const next = new Set(prev);
+      if (next.has(code)) next.delete(code);
+      else next.add(code);
+      return next;
+    });
+  };
+
+  const confirmScanImport = () => {
+    const codes = Array.from(selectedScannedCodes);
+    if (codes.length === 0) {
+      showToast('请至少选择一个基金代码', 'error');
+      return;
+    }
+    handleScanResult(codes);
+    setScanConfirmModalOpen(false);
+    setScannedFunds([]);
+    setSelectedScannedCodes(new Set());
+  };
+
+  const handleScanResult = (codes) => {
+    if (!codes || codes.length === 0) return;
+    // 如果只有一个代码，直接搜索
+    if (codes.length === 1) {
+      const code = codes[0];
+      setSearchTerm(code);
+      if (inputRef.current) inputRef.current.focus();
+      if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+      searchTimeoutRef.current = setTimeout(() => performSearch(code), 300);
+    } else {
+      // 多个代码，直接批量添加
+      (async () => {
+        setLoading(true);
+        let successCount = 0;
+        try {
+          const newFunds = [];
+          for (const code of codes) {
+             if (funds.some(existing => existing.code === code)) continue;
+             try {
+               const data = await fetchFundData(code);
+               newFunds.push(data);
+               successCount++;
+             } catch (e) {
+               console.error(`添加基金 ${code} 失败`, e);
+             }
+          }
+          if (newFunds.length > 0) {
+            const updated = dedupeByCode([...newFunds, ...funds]);
+            setFunds(updated);
+            storageHelper.setItem('funds', JSON.stringify(updated));
+            setSuccessModal({ open: true, message: `成功导入 ${successCount} 个基金` });
+          } else {
+             if (codes.length > 0 && successCount === 0) {
+                showToast('未找到有效基金或已存在', 'info');
+             }
+          }
+        } catch (e) {
+          showToast('批量导入失败', 'error');
+        } finally {
+          setLoading(false);
+        }
+      })();
+    }
+  };
+
   const [cloudConfigModal, setCloudConfigModal] = useState({ open: false, userId: null });
   const syncDebounceRef = useRef(null);
   const lastSyncedRef = useRef('');
@@ -3047,6 +3247,43 @@ export default function HomePage() {
       }
       return [...prev, fund];
     });
+  };
+
+  const handleScanImportConfirm = async (codes) => {
+    if (!Array.isArray(codes) || codes.length === 0) return;
+    const uniqueCodes = Array.from(new Set(codes));
+    const toAdd = uniqueCodes.filter(c => !funds.some(f => f.code === c));
+    if (toAdd.length === 0) {
+      setSuccessModal({ open: true, message: '识别的基金已全部添加' });
+      return;
+    }
+    setLoading(true);
+    try {
+      const added = [];
+      for (const code of toAdd) {
+        try {
+          const data = await fetchFundData(code);
+          if (data && data.code) {
+            added.push(data);
+          }
+        } catch (e) {
+          console.error(`通过识别导入基金 ${code} 失败`, e);
+        }
+      }
+      if (added.length > 0) {
+        setFunds(prev => {
+          const merged = [...prev, ...added];
+          const deduped = Array.from(new Map(merged.map(f => [f.code, f])).values());
+          storageHelper.setItem('funds', JSON.stringify(deduped));
+          return deduped;
+        });
+        setSuccessModal({ open: true, message: `已导入 ${added.length} 只基金` });
+      } else {
+        setSuccessModal({ open: true, message: '未能导入任何基金，请检查截图清晰度' });
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const batchAddFunds = async () => {
@@ -3848,7 +4085,9 @@ export default function HomePage() {
       donateOpen ||
       !!fundDeleteConfirm ||
       updateModalOpen ||
-      weChatOpen;
+      weChatOpen ||
+      scanModalOpen ||
+      scanConfirmModalOpen;
 
     if (isAnyModalOpen) {
       document.body.style.overflow = 'hidden';
@@ -3874,8 +4113,11 @@ export default function HomePage() {
     tradeModal.open,
     clearConfirm,
     donateOpen,
+    fundDeleteConfirm,
     updateModalOpen,
-    weChatOpen
+    weChatOpen,
+    scanModalOpen,
+    scanConfirmModalOpen
   ]);
 
   useEffect(() => {
@@ -3956,7 +4198,7 @@ export default function HomePage() {
                     <path d="M16.5 16.5L21 21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                   </svg>
                 </span>
-                <div className="input navbar-input-shell">
+                <div className="input navbar-input-shell" style={{ display: 'flex', alignItems: 'center' }}>
                   <input
                     ref={inputRef}
                     className="navbar-input-field"
@@ -3971,7 +4213,11 @@ export default function HomePage() {
                       // 延迟关闭，以允许点击搜索结果
                       setTimeout(() => setIsSearchFocused(false), 200);
                     }}
+                    style={{ flex: 1 }}
                   />
+                  <div style={{ marginRight: 8, display: 'flex', alignItems: 'center' }}>
+                    <ScanButton onClick={handleScanClick} disabled={isScanning} />
+                  </div>
                 </div>
                 {isSearching && <div className="search-spinner" />}
               </div>
@@ -3985,7 +4231,9 @@ export default function HomePage() {
                   opacity: refreshing ? 0.6 : 1,
                   display: (isSearchFocused || selectedFunds.length > 0) ? 'inline-flex' : undefined,
                   alignItems: 'center',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  whiteSpace: 'nowrap',
+                  minWidth: 'fit-content'
                 }}
               >
                 {loading ? '添加中…' : '添加'}
@@ -5157,6 +5405,128 @@ export default function HomePage() {
         )}
       </AnimatePresence>
 
+      <AnimatePresence>
+        {scanModalOpen && (
+          <motion.div
+            className="modal-overlay"
+            role="dialog"
+            aria-modal="true"
+            aria-label="选择持仓截图"
+            onClick={() => setScanModalOpen(false)}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="glass card modal"
+              onClick={(e) => e.stopPropagation()}
+              style={{ width: 420, maxWidth: '90vw' }}
+            >
+              <div className="title" style={{ marginBottom: 12 }}>
+                <span>选择持仓截图</span>
+              </div>
+              <div className="muted" style={{ fontSize: 13, lineHeight: 1.6, marginBottom: 12 }}>
+                从相册选择一张或多张持仓截图，系统将自动识别其中的基金代码（6位数字），并支持批量导入。
+              </div>
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                <button className="button secondary" onClick={() => setScanModalOpen(false)}>取消</button>
+                <button className="button" onClick={handleScanPick} disabled={isScanning}>
+                  {isScanning ? '处理中…' : '选择图片'}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {scanConfirmModalOpen && (
+          <motion.div
+            className="modal-overlay"
+            role="dialog"
+            aria-modal="true"
+            aria-label="确认导入基金"
+            onClick={() => setScanConfirmModalOpen(false)}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="glass card modal"
+              onClick={(e) => e.stopPropagation()}
+              style={{ width: 460, maxWidth: '90vw' }}
+            >
+              <div className="title" style={{ marginBottom: 12, justifyContent: 'space-between' }}>
+                <span>确认导入基金</span>
+                <button className="icon-button" onClick={() => setScanConfirmModalOpen(false)} style={{ border: 'none', background: 'transparent' }}>
+                  <CloseIcon width="20" height="20" />
+                </button>
+              </div>
+              {scannedFunds.length === 0 ? (
+                <div className="muted" style={{ fontSize: 13, lineHeight: 1.6 }}>
+                  未识别到有效的基金代码，请尝试更清晰的截图或手动搜索。
+                </div>
+              ) : (
+                <div className="search-results pending-list" style={{ maxHeight: 320, overflowY: 'auto' }}>
+                  {scannedFunds.map((item) => {
+                    const isSelected = selectedScannedCodes.has(item.code);
+                    const isAlreadyAdded = item.status === 'added';
+                    const isInvalid = item.status === 'invalid';
+                    const isDisabled = isAlreadyAdded || isInvalid;
+                    const displayName = item.name || (isInvalid ? '未找到基金' : '未知基金');
+                    return (
+                      <div
+                        key={item.code}
+                        className={`search-item ${isSelected ? 'selected' : ''} ${isAlreadyAdded ? 'added' : ''}`}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => {
+                          if (isDisabled) return;
+                          toggleScannedCode(item.code);
+                        }}
+                        style={{ cursor: isDisabled ? 'not-allowed' : 'pointer' }}
+                      >
+                        <div className="fund-info">
+                          <span className="fund-name">{displayName}</span>
+                          <span className="fund-code muted">#{item.code}</span>
+                        </div>
+                        {isAlreadyAdded ? (
+                          <span className="added-label">已添加</span>
+                        ) : isInvalid ? (
+                          <span className="added-label">未找到</span>
+                        ) : (
+                          <div className="checkbox">
+                            {isSelected && <div className="checked-mark" />}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 12 }}>
+                <button className="button secondary" onClick={() => setScanConfirmModalOpen(false)}>取消</button>
+                <button className="button" onClick={confirmScanImport} disabled={selectedScannedCodes.size === 0}>确认导入</button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <input
+        type="file"
+        ref={fileInputRef}
+        accept="image/*"
+        multiple
+        style={{ display: 'none' }}
+        onChange={handleFilesUpload}
+      />
+
       {settingsOpen && (
         <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="设置" onClick={() => setSettingsOpen(false)}>
           <div className="glass card modal" onClick={(e) => e.stopPropagation()}>
@@ -5291,6 +5661,57 @@ export default function HomePage() {
                   刷新浏览器
                 </button>
               </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isScanning && (
+          <motion.div
+            className="modal-overlay"
+            role="dialog"
+            aria-modal="true"
+            aria-label="识别进度"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="glass card modal"
+              style={{ width: 320, maxWidth: '90vw', textAlign: 'center', padding: '24px' }}
+            >
+              <div style={{ marginBottom: 16 }}>
+                <div className="loading-spinner" style={{ 
+                  width: 40, 
+                  height: 40, 
+                  border: '3px solid var(--muted)', 
+                  borderTopColor: 'var(--primary)', 
+                  borderRadius: '50%', 
+                  margin: '0 auto',
+                  animation: 'spin 1s linear infinite'
+                }} />
+              </div>
+              <div className="title" style={{ justifyContent: 'center', marginBottom: 8 }}>
+                {scanProgress.stage === 'verify' ? '正在验证基金…' : '正在识别中…'}
+              </div>
+              {scanProgress.total > 0 && (
+                <div className="muted" style={{ marginBottom: 20 }}>
+                  {scanProgress.stage === 'verify'
+                    ? `已验证 ${scanProgress.current} / ${scanProgress.total} 只基金`
+                    : `已处理 ${scanProgress.current} / ${scanProgress.total} 张图片`}
+                </div>
+              )}
+              <button 
+                className="button danger" 
+                onClick={cancelScan}
+                style={{ width: '100%' }}
+              >
+                终止识别
+              </button>
             </motion.div>
           </motion.div>
         )}
