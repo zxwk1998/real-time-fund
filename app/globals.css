@@ -8,6 +8,7 @@
   --success: #34d399;
   --danger: #f87171;
   --border: #1f2937;
+  --border-radius: 5px;
 }
 
 * {
@@ -33,11 +34,19 @@ body {
 }
 
 .glass {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
-  backdrop-filter: blur(8px);
+  background: linear-gradient(117deg, #ffffff1a 17%, #ffffff0d 51%);
+  -webkit-backdrop-filter: blur(40px);
+  backdrop-filter: blur(40px);
+  pointer-events: auto;
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+}
+
+.glass::before {
+  border: 1px solid;
+  border-image: linear-gradient(100deg, #ffffff53 0%, #ffffff00 100%);
+  border-image-slice: 1 0 0 1;
+  -webkit-filter: blur(2px);
+  filter: blur(2px);
 }
 
 .card .title {
@@ -94,8 +103,8 @@ body {
 .navbar {
   position: fixed;
   top: 0;
-  left: 16px;
-  right: 16px;
+  left: 0;
+  right: 0;
   z-index: 50;
   padding: 12px 16px;
   display: flex;
@@ -147,7 +156,7 @@ body {
 
 .navbar-add-fund .input {
   width: 100%;
-  border-radius: 999px;
+  border-radius: var(--border-radius);
   background: rgba(11, 18, 32, 0.9);
 }
 
@@ -179,6 +188,7 @@ body {
 
 /* Mobile Search Logic */
 @media (max-width: 640px) {
+
   /* Default: Search hidden, Trigger visible */
   .navbar-add-fund {
     display: flex;
@@ -286,7 +296,6 @@ body {
     top: 0;
     left: 0;
     right: 0;
-    border-radius: 0;
     border-top: none;
     border-left: none;
     border-right: none;
@@ -318,7 +327,7 @@ body {
   min-height: 44px;
   height: auto;
   padding: 0 14px;
-  border-radius: 12px;
+  border-radius: var(--border-radius);
   border: 1px solid var(--border);
   background: #0b1220;
   color: var(--text);
@@ -346,7 +355,7 @@ input[type="number"] {
 .button {
   height: 44px;
   padding: 0 16px;
-  border-radius: 12px;
+   border-radius: var(--border-radius);
   border: 1px solid var(--border);
   background: linear-gradient(180deg, #0ea5e9, #22d3ee);
   color: #05263b;
@@ -380,7 +389,7 @@ input[type="number"] {
   gap: 8px;
   align-items: center;
   padding: 6px 10px;
-  border-radius: 999px;
+   border-radius: var(--border-radius);
   border: 1px solid var(--border);
   background: #0b1220;
   font-size: 12px;
@@ -392,7 +401,7 @@ input[type="number"] {
   align-items: center;
   gap: 2px;
   padding: 4px 10px;
-  border-radius: 8px;
+   border-radius: var(--border-radius);
   border: 1px solid var(--border);
   background: #0b1220;
   font-size: 12px;
@@ -516,7 +525,7 @@ input[type="number"] {
   align-items: center;
   justify-content: space-between;
   padding: 8px 10px;
-  border-radius: 10px;
+   border-radius: var(--border-radius);
   border: 1px solid var(--border);
   background: #0b1220;
 }
@@ -589,7 +598,7 @@ input[type="number"] {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
+   border-radius: var(--border-radius);
   border: 1px solid var(--border);
   background: #0b1220;
   color: var(--muted);
@@ -616,7 +625,7 @@ input[type="number"] {
 .sticky-toggle-btn:hover {
   opacity: 1 !important;
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
+   border-radius: var(--border-radius);
 }
 
 .icon-button.danger {
@@ -746,7 +755,7 @@ input[type="number"] {
   justify-content: center;
   width: 16px;
   height: 16px;
-  border-radius: 50%;
+   border-radius: var(--border-radius);
   background: rgba(34, 197, 94, 0.2);
   color: #22c55e;
   font-size: 10px;
@@ -839,7 +848,8 @@ input[type="number"] {
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: inset 10px 0 20px -10px rgba(0,0,0,0.2); /* 增加一点内阴影，增加层次感 */
+  box-shadow: inset 10px 0 20px -10px rgba(0, 0, 0, 0.2);
+  /* 增加一点内阴影，增加层次感 */
 }
 
 .stat-compact .down {
@@ -853,7 +863,7 @@ input[type="number"] {
   background: rgba(15, 23, 42, 0.85);
   backdrop-filter: blur(12px);
   padding: 8px 12px;
-  border-radius: 12px;
+   border-radius: var(--border-radius);
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -862,14 +872,15 @@ input[type="number"] {
   z-index: 35;
   background: rgba(15, 23, 42, 0.9);
   backdrop-filter: blur(16px);
-  border-radius: 12px;
+   border-radius: var(--border-radius);
   margin-bottom: 16px;
 }
 
 @media (max-width: 640px) {
   .filter-bar {
     position: sticky;
-    top: 60px; /* Navbar height */
+    top: 60px;
+    /* Navbar height */
     z-index: 40;
     width: calc(100% + 32px);
     background: rgba(15, 23, 42, 0.9);
@@ -915,7 +926,7 @@ input[type="number"] {
 
 .tab {
   padding: 0 20px;
-  border-radius: 8px;
+   border-radius: var(--border-radius);
   border: none;
   background: transparent;
   color: var(--muted);
@@ -945,6 +956,7 @@ input[type="number"] {
     color: var(--muted);
     background: transparent;
   }
+
   .tab.active,
   .tab.active:hover {
     background: rgba(34, 211, 238, 0.15);
@@ -990,28 +1002,45 @@ input[type="number"] {
   justify-content: center;
   height: 32px;
   padding: 0 12px;
-  border-radius: 999px;
+   border-radius: var(--border-radius);
   border: 1px solid var(--border);
   background: #0b1220;
   color: var(--text);
   cursor: pointer;
   transition: border-color 200ms ease, transform 150ms ease;
 }
-.chip:hover { transform: translateY(-1px); border-color: var(--accent); }
-.chip.active { background: linear-gradient(180deg, #0ea5e9, #22d3ee); color: #05263b; border-color: transparent; }
+
+.chip:hover {
+  transform: translateY(-1px);
+  border-color: var(--accent);
+}
+
+.chip.active {
+  background: linear-gradient(180deg, #0ea5e9, #22d3ee);
+  color: #05263b;
+  border-color: transparent;
+}
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
+
 .spin {
   animation: spin 0.8s linear infinite;
 }
+
 .icon-button[aria-busy="true"] {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(96,165,250,0.15);
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15);
   cursor: default;
 }
+
 @media (prefers-reduced-motion: reduce) {
   .spin {
     animation: none;
@@ -1031,8 +1060,13 @@ input[type="number"] {
 }
 
 @keyframes loading {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 /* 搜索相关样式 */
@@ -1056,7 +1090,7 @@ input[type="number"] {
   height: 18px;
   border: 2px solid rgba(255, 255, 255, 0.1);
   border-top-color: var(--primary);
-  border-radius: 50%;
+   border-radius: var(--border-radius);
   animation: spin 0.8s linear infinite;
 }
 
@@ -1083,7 +1117,7 @@ input[type="number"] {
   align-items: center;
   justify-content: space-between;
   padding: 10px 14px;
-  border-radius: 10px;
+   border-radius: var(--border-radius);
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -1120,7 +1154,7 @@ input[type="number"] {
 .checkbox {
   width: 20px;
   height: 20px;
-  border-radius: 6px;
+   border-radius: var(--border-radius);
   border: 2px solid var(--border);
   display: flex;
   align-items: center;
@@ -1145,7 +1179,7 @@ input[type="number"] {
   font-size: 11px;
   padding: 2px 8px;
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
+   border-radius: var(--border-radius);
   color: var(--muted);
 }
 
@@ -1184,7 +1218,7 @@ input[type="number"] {
   padding: 4px 10px;
   background: rgba(34, 211, 238, 0.15);
   border: 1px solid rgba(34, 211, 238, 0.3);
-  border-radius: 8px;
+   border-radius: var(--border-radius);
   font-size: 12px;
   color: var(--primary);
 }
@@ -1198,7 +1232,7 @@ input[type="number"] {
   border: none;
   color: var(--primary);
   cursor: pointer;
-  border-radius: 4px;
+   border-radius: var(--border-radius);
 }
 
 .remove-chip:hover {
@@ -1264,16 +1298,19 @@ input[type="number"] {
   overflow-x: auto;
   white-space: nowrap;
   gap: 4px;
-  padding: 4px 0; /* 移除左右内边距，由 mask 和 scroll 行为控制 */
+  padding: 4px 0;
+  /* 移除左右内边距，由 mask 和 scroll 行为控制 */
   scroll-behavior: smooth;
-  scrollbar-width: none; /* Firefox */
+  scrollbar-width: none;
+  /* Firefox */
   cursor: grab;
   user-select: none;
 }
 
 .tabs::after {
   content: "";
-  flex: 0 0 16px; /* 末尾留一点空隙，避免贴边 */
+  flex: 0 0 16px;
+  /* 末尾留一点空隙，避免贴边 */
 }
 
 .tabs:active {
@@ -1281,7 +1318,8 @@ input[type="number"] {
 }
 
 .tabs::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
+  display: none;
+  /* Chrome/Safari */
 }
 
 /* 管理分组弹窗列表 */
@@ -1299,7 +1337,7 @@ input[type="number"] {
   align-items: center;
   gap: 12px;
   padding: 8px;
-  border-radius: 12px;
+   border-radius: var(--border-radius);
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border);
   /* 移除全局 transition，避免与 Framer Motion 冲突 */
@@ -1338,7 +1376,7 @@ input[type="number"] {
 .add-group-btn {
   width: 32px;
   height: 32px;
-  border-radius: 8px;
+   border-radius: var(--border-radius);
   background: rgba(255, 255, 255, 0.05);
   border: 1px dashed var(--border);
   flex-shrink: 0;
@@ -1356,13 +1394,13 @@ input[type="number"] {
 .add-group-row-btn:hover {
   border-color: var(--primary) !important;
   color: var(--primary) !important;
-  background: rgba(255,255,255,0.05) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
 }
 
 .tabs-nav-btn {
   width: 28px;
   height: 28px;
-  border-radius: 50%;
+   border-radius: var(--border-radius);
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid var(--border);
   display: flex;
@@ -1423,7 +1461,7 @@ input[type="number"] {
 .user-avatar-small {
   width: 20px;
   height: 20px;
-  border-radius: 50%;
+   border-radius: var(--border-radius);
   background: linear-gradient(135deg, var(--primary), var(--accent));
   color: #05263b;
   font-size: 11px;
@@ -1453,7 +1491,7 @@ input[type="number"] {
 .user-avatar-large {
   width: 40px;
   height: 40px;
-  border-radius: 50%;
+   border-radius: var(--border-radius);
   background: linear-gradient(135deg, var(--primary), var(--accent));
   color: #05263b;
   font-size: 18px;
@@ -1498,7 +1536,7 @@ input[type="number"] {
   width: 100%;
   padding: 10px 12px;
   border: none;
-  border-radius: 10px;
+   border-radius: var(--border-radius);
   background: transparent;
   color: var(--text);
   font-size: 14px;
@@ -1525,7 +1563,7 @@ input[type="number"] {
 
 .login-message {
   padding: 10px 14px;
-  border-radius: 10px;
+   border-radius: var(--border-radius);
   font-size: 13px;
   display: flex;
   align-items: center;

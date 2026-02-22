@@ -145,7 +145,7 @@ export default function GroupManageModal({ groups, onClose, onSave }) {
               width: '100%',
               marginTop: 12,
               padding: '10px',
-              borderRadius: '12px',
+              borderRadius: '5px',
               border: '1px dashed var(--border)',
               background: 'rgba(255,255,255,0.02)',
               color: 'var(--muted)',

@@ -2626,7 +2626,7 @@ export default function HomePage() {
                   <input
                     ref={inputRef}
                     className="navbar-input-field"
-                    placeholder="搜索基金名称或代码..."
+                    placeholder="请输入基金名称"
                     value={searchTerm}
                     onChange={handleSearchInput}
                     onFocus={() => {
@@ -2953,7 +2953,7 @@ export default function HomePage() {
             </div>
 
             <div className="sort-group" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div className="view-toggle" style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', padding: '2px' }}>
+              <div className="view-toggle" style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', borderRadius: '5px', padding: '2px' }}>
                 <button
                   className={`icon-button ${viewMode === 'card' ? 'active' : ''}`}
                   onClick={() => { applyViewMode('card'); }}
@@ -3053,7 +3053,7 @@ export default function HomePage() {
                     height: '48px',
                     border: '2px dashed rgba(255,255,255,0.1)',
                     background: 'transparent',
-                    borderRadius: '12px',
+                    borderRadius: '5px',
                     color: 'var(--muted)',
                     display: 'flex',
                     alignItems: 'center',
