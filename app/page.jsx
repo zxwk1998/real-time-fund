@@ -2568,7 +2568,7 @@ export default function HomePage() {
             <circle cx="12" cy="12" r="10" stroke="var(--accent)" strokeWidth="2" />
             <path d="M5 14c2-4 7-6 14-5" stroke="var(--primary)" strokeWidth="2" />
           </svg> */}
-          <span>基估宝</span>
+          <span>梦想家园</span>
           <AnimatePresence>
             {isSyncing && (
               <motion.div
