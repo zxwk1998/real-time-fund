@@ -65,8 +65,7 @@ function ScanButton({ onClick, disabled }) {
       style={{
         opacity: disabled ? 0.5 : 1,
         cursor: disabled ? 'wait' : 'pointer',
-        width: '32px',
-        height: '32px'
+        marginRight:'-15px'
       }}
     >
       {disabled ? (
@@ -2561,14 +2560,14 @@ export default function HomePage() {
 
   return (
     <div className="container content">
-      <Announcement />
+      {/* <Announcement /> */}
       <div className="navbar glass" ref={navbarRef}>
         {refreshing && <div className="loading-bar"></div>}
         <div className={`brand ${(isSearchFocused || selectedFunds.length > 0) ? 'search-focused-sibling' : ''}`}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          {/* <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
             <circle cx="12" cy="12" r="10" stroke="var(--accent)" strokeWidth="2" />
             <path d="M5 14c2-4 7-6 14-5" stroke="var(--primary)" strokeWidth="2" />
-          </svg>
+          </svg> */}
           <span>基估宝</span>
           <AnimatePresence>
             {isSyncing && (
@@ -2657,7 +2656,9 @@ export default function HomePage() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   whiteSpace: 'nowrap',
-                  minWidth: 'fit-content'
+                  minWidth: 'fit-content',
+                  height: '42px',
+                  padding: '0 20px'
                 }}
               >
                 {loading ? '添加中…' : '添加'}

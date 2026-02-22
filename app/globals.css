@@ -9,6 +9,7 @@
   --danger: #f87171;
   --border: #1f2937;
   --border-radius: 5px;
+  --button-height: 32px;
 }
 
 * {
@@ -172,7 +173,7 @@ body {
   padding-right: 12px;
   padding-top: 6px !important;
   padding-bottom: 6px !important;
-  min-height: 44px;
+  min-height: var(--button-height);
   flex-wrap: wrap;
   position: relative;
   z-index: 1;
@@ -317,7 +318,7 @@ body {
 
 .input {
   flex: 1;
-  min-height: 44px;
+  min-height: var(--button-height);
   height: auto;
   padding: 0 14px;
   border-radius: var(--border-radius);
@@ -346,15 +347,15 @@ input[type="number"] {
 }
 
 .button {
-  height: 44px;
-  padding: 0 16px;
+  height: var(--button-height);
   border-radius: var(--border-radius);
   border: 1px solid var(--border);
-  background:var(--primary);
+  background: var(--primary);
   color: var(--text);
   font-weight: 600;
   cursor: pointer;
   transition: transform 150ms ease, box-shadow 200ms ease;
+  padding: 0 12px;
 }
 
 .button:hover {
@@ -381,11 +382,16 @@ input[type="number"] {
   display: inline-flex;
   gap: 8px;
   align-items: center;
-  padding: 6px 10px;
   border-radius: var(--border-radius);
   border: 1px solid var(--border);
   background: #0b1220;
   font-size: 12px;
+  padding-left: 12px;
+  padding-right: 12px;
+  height: var(--button-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .badge-v {
@@ -546,6 +552,9 @@ input[type="number"] {
   padding: 24px;
   text-align: center;
   color: var(--muted);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border);
+  background: #0b1220;
 }
 
 .error-text {
@@ -586,8 +595,8 @@ input[type="number"] {
 }
 
 .icon-button {
-  width: 36px;
-  height: 36px;
+  width: var(--button-height);
+  height: var(--button-height);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -853,7 +862,7 @@ input[type="number"] {
   transition: all 0.3s ease;
   position: sticky;
   z-index: 40;
-  background: rgba(15, 23, 42, 0.85);
+  background: #0b1220;
   backdrop-filter: blur(12px);
   padding: 8px 12px;
   border-radius: var(--border-radius);
@@ -875,7 +884,7 @@ input[type="number"] {
     top: 60px;
     /* Navbar height */
     z-index: 40;
-    width: calc(100% + 32px);
+    width: calc(100% + var(--button-height));
     background: rgba(15, 23, 42, 0.9);
     margin: 0 -16px 16px -16px;
     padding: 10px 16px;
@@ -898,7 +907,7 @@ input[type="number"] {
 
   .group-summary-sticky {
     top: 175px;
-    width: calc(100% + 32px);
+    width: calc(100% + var(--button-height));
     margin: 0 -16px 16px -16px;
     padding: 8px 16px;
     border-radius: 0;
@@ -927,8 +936,8 @@ input[type="number"] {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  height: 32px;
-  line-height: 32px;
+  height: var(--button-height);
+  line-height: var(--button-height);
   display: inline-flex;
   align-items: center;
 }
@@ -1025,8 +1034,8 @@ input[type="number"] {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 32px;
-  line-height: 32px;
+  height: var(--button-height);
+  line-height: var(--button-height);
   border-radius: var(--border-radius);
   border: 1px solid var(--border);
   background: transparent;
@@ -1398,8 +1407,8 @@ input[type="number"] {
 }
 
 .add-group-btn {
-  width: 32px;
-  height: 32px;
+  width: var(--button-height);
+  height: var(--button-height);
   border-radius: var(--border-radius);
   background: rgba(255, 255, 255, 0.05);
   border: 1px dashed var(--border);
@@ -1422,8 +1431,8 @@ input[type="number"] {
 }
 
 .tabs-nav-btn {
-  width: 32px;
-  height: 32px;
+  width: var(--button-height);
+  height: var(--button-height);
   border-radius: var(--border-radius);
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid var(--border);
