@@ -2749,6 +2749,17 @@ export default function HomePage() {
           >
             <RefreshIcon className={refreshing ? 'spin' : ''} width="18" height="18" />
           </button>
+ <button
+            className="icon-button"
+           onClick={() => {
+                          setUserMenuOpen(false);
+                          setSettingsOpen(true);
+                        }}
+            title="立即刷新"
+          >
+          <SettingsIcon width="16" height="16" />
+          </button>
+          
           {/*<button*/}
           {/*  className="icon-button"*/}
           {/*  aria-label="打开设置"*/}
@@ -2759,7 +2770,7 @@ export default function HomePage() {
           {/*  <SettingsIcon width="18" height="18" />*/}
           {/*</button>*/}
           {/* 用户菜单 */}
-          <div className="user-menu-container" ref={userMenuRef}>
+          {/* <div className="user-menu-container" ref={userMenuRef}>
             <button
               className={`icon-button user-menu-trigger ${user ? 'logged-in' : ''}`}
               aria-label={user ? '用户菜单' : '登录'}
@@ -2869,7 +2880,7 @@ export default function HomePage() {
                 </motion.div>
               )}
             </AnimatePresence>
-          </div>
+          </div> */}
         </div>
       </div>
 
@@ -2999,7 +3010,7 @@ export default function HomePage() {
                           setSortOrder('desc');
                         }
                       }}
-                      style={{ height: '28px', fontSize: '12px', padding: '0 10px', display: 'flex', alignItems: 'center', gap: 4 }}
+                      style={{ height: '32px', fontSize: '12px', padding: '0 10px', display: 'flex', alignItems: 'center', gap: 4 }}
                     >
                       <span>{s.label}</span>
                       {s.id !== 'default' && sortBy === s.id && (
@@ -3294,7 +3305,7 @@ export default function HomePage() {
                                         className="icon-button"
                                         onClick={(e) => { e.stopPropagation(); setActionModal({ open: true, fund: f }); }}
                                         title="编辑持仓"
-                                        style={{ border: 'none', width: '28px', height: '28px', marginLeft: -6 }}
+                                        style={{ border: 'none', width: '28px', height: '32px', marginLeft: -6 }}
                                       >
                                         <SettingsIcon width="14" height="14" />
                                       </button>
@@ -3355,7 +3366,7 @@ export default function HomePage() {
                                     onClick={() => !refreshing && requestRemoveFund(f)}
                                     title="删除"
                                     disabled={refreshing}
-                                    style={{ width: '28px', height: '28px', opacity: refreshing ? 0.6 : 1, cursor: refreshing ? 'not-allowed' : 'pointer' }}
+                                    style={{ width: '28px', height: '32px', opacity: refreshing ? 0.6 : 1, cursor: refreshing ? 'not-allowed' : 'pointer' }}
                                   >
                                     <TrashIcon width="14" height="14" />
                                   </button>
@@ -3410,7 +3421,7 @@ export default function HomePage() {
                                         onClick={() => !refreshing && requestRemoveFund(f)}
                                         title="删除"
                                         disabled={refreshing}
-                                        style={{ width: '28px', height: '28px', opacity: refreshing ? 0.6 : 1, cursor: refreshing ? 'not-allowed' : 'pointer' }}
+                                        style={{ width: '28px', height: '32px', opacity: refreshing ? 0.6 : 1, cursor: refreshing ? 'not-allowed' : 'pointer' }}
                                       >
                                         <TrashIcon width="14" height="14" />
                                       </button>
