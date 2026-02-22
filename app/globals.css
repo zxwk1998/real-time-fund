@@ -25,13 +25,15 @@ body {
   margin: 0;
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
   background: radial-gradient(1200px 600px at 10% -10%, rgba(96, 165, 250, 0.15), transparent 40%), radial-gradient(1000px 500px at 90% 0%, rgba(34, 211, 238, 0.12), transparent 45%), var(--bg);
+  background-size: 100% 100%;
+  background-attachment: fixed;
   color: var(--text);
 }
 
 .container {
-  max-width: 1120px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 20px;
 }
 
 .glass {
@@ -342,9 +344,6 @@ input[type="number"]::-webkit-inner-spin-button {
   margin: 0;
 }
 
-input[type="number"] {
-  -moz-appearance: textfield;
-}
 
 .button {
   height: var(--button-height);
@@ -354,18 +353,9 @@ input[type="number"] {
   color: var(--text);
   font-weight: 600;
   cursor: pointer;
-  transition: transform 150ms ease, box-shadow 200ms ease;
   padding: 0 12px;
 }
 
-.button:hover {
-
-  box-shadow: 0 10px 20px rgba(34, 211, 238, 0.25);
-}
-
-.button:active {
-  transform: translateY(0);
-}
 
 .card {
   padding: 16px;
@@ -614,9 +604,6 @@ input[type="number"] {
   border-color: var(--accent);
 }
 
-.icon-button:active {
-  transform: translateY(0);
-}
 
 .sticky-toggle-btn {
   display: inline-flex !important;

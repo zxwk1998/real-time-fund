@@ -183,7 +183,7 @@ function GroupSummary({ funds, holdings, groupName, getProfit, stickyTop }) {
 
   return (
     <div className={isSticky ? "group-summary-sticky" : ""} style={isSticky && stickyTop ? { top: stickyTop } : {}}>
-    <div className="glass card group-summary-card" style={{ marginBottom: 8, padding: '16px 20px', background: 'rgba(255, 255, 255, 0.03)', position: 'relative' }}>
+    <div className="glass card group-summary-card" style={{ marginBottom: 10, padding: '16px 20px', background: 'rgba(255, 255, 255, 0.03)', position: 'relative' }}>
       <span
         className="sticky-toggle-btn"
         onClick={() => setIsSticky(!isSticky)}
@@ -2887,7 +2887,7 @@ export default function HomePage() {
 
       <div className="grid">
         <div className="col-12">
-          <div ref={filterBarRef} className="filter-bar" style={{ top: isMobile ? undefined : navbarHeight , marginTop: navbarHeight, marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+          <div ref={filterBarRef} className="filter-bar" style={{ top: isMobile ? undefined : 70 , marginTop:'0', marginBottom:60, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12,width:'100%'}}>
             <div className="tabs-container">
               <div
                 className="tabs-scroll-area"
