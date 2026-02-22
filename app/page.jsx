@@ -2638,9 +2638,9 @@ export default function HomePage() {
                     }}
                     style={{ flex: 1 }}
                   />
-                  <div style={{ marginRight: 8, display: 'flex', alignItems: 'center' }}>
+                  {/* <div style={{ marginRight: 8, display: 'flex', alignItems: 'center' }}>
                     <ScanButton onClick={handleScanClick} disabled={isScanning} />
-                  </div>
+                  </div> */}
                 </div>
                 {isSearching && <div className="search-spinner" />}
               </div>
@@ -2657,7 +2657,7 @@ export default function HomePage() {
                   justifyContent: 'center',
                   whiteSpace: 'nowrap',
                   minWidth: 'fit-content',
-                  height: '42px',
+                  height: '34px',
                   padding: '0 20px'
                 }}
               >
